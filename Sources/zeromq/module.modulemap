@@ -1,0 +1,4 @@
+module zeromq {
+    umbrella header "zeromq.h"
+    link "zeromq"
+}
