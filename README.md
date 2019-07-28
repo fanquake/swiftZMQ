@@ -3,7 +3,7 @@
 Swift 5 bindings for [ØMQ](http://zeromq.org/) 4.x (WIP).
 
 ZeroMQ must be available.
-```shell
+```bash
 brew install zeromq
 ```
 
@@ -18,6 +18,11 @@ dependencies: [
 
 Subscribe to a `bitcoind` socket streaming `hashtx` & `hashblock` messages.
 
+```bash
+# Run bitcoind
+src/bitcoind -zmqpubhashtx=tcp://127.0.0.1:28332 -zmqpubrawtx=ipc:///tmp/bitcoind.tx.raw -zmqpubhashtxhwm=10000
+```
+
 ```swift
 import Foundation
 import swiftZMQ
@@ -25,6 +30,10 @@ import swiftZMQ
 extension Data {
     func hexEncodedString() -> String {
         return map { String(format: "%02hhx", $0) }.joined()
+    }
+
+    func asString() -> String {
+        return String(bytes: self, encoding: .utf8)!
     }
 }
 
@@ -41,14 +50,13 @@ try socket.subscribe("hashblock")
 
 repeat {
     let msg = try socket.recvMultipart()
-    print(String(bytes: msg[0], encoding: .utf8)!)
+    print(msg[0].asString())
     print(msg[1].hexEncodedString())
 } while true
 ```
 
-```shell
+```bash
 swift run
-[2/2] Linking ./.build/x86_64-apple-macosx/debug/zmq
 swiftZMQ: 4.3.1
 hashtx
 37d6c159c076fd6640df7f45548acdcf85387b26abebeae3751ec4fc655053fd
